@@ -5,11 +5,11 @@ import { User,
 	UserCredit, 
 	UserRun
 } from "../models/user.model";
-import { PagedResponse } from "../models/api-response.model";
-import { UserDalc } from "../dalc/user.dalc";
+import { PagedResponse } from "../dto/api-response.model";
+import { UserDalc } from "../dalc/users.dalc";
 
 export class UsersService {
-  	public getAll(skip?: number): PagedResponse<User[]> {
+  	public getAll(offset?: number): PagedResponse<User[]> {
 		const response: User[] = [
 			{
 				id: 1,
@@ -71,7 +71,7 @@ export class UsersService {
 		};
 	}
 
-	public getActivities(id: number, skip?: number): PagedResponse<UserActivity[]> {
+	public getActivities(id: number, offset?: number): PagedResponse<UserActivity[]> {
 		const response: UserActivity[] = [];
 		let totalCount: number = 0;
 
@@ -85,7 +85,7 @@ export class UsersService {
 		}
 	}
 
-	public getFollowers(id: number, skip?: number): PagedResponse<UserFollow[]> {
+	public getFollowers(id: number, offset?: number): PagedResponse<UserFollow[]> {
 		const response: UserFollow[] = [];
 		let totalCount: number = 0;
 
@@ -99,7 +99,7 @@ export class UsersService {
 		}
 	}
 
-	public getFollowed(id: number, skip?: number): PagedResponse<UserFollow[]> {
+	public getFollowed(id: number, offset?: number): PagedResponse<UserFollow[]> {
 		const response: UserFollow[] = [];
 		let totalCount: number = 0;
 
@@ -113,7 +113,7 @@ export class UsersService {
 		}
 	}
 
-	public getCredits(id: number, skip?: number): PagedResponse<UserCredit[]> {
+	public getCredits(id: number, offset?: number): PagedResponse<UserCredit[]> {
 		const response: UserCredit[] = [];
 		let totalCount: number = 0;
 
@@ -127,7 +127,7 @@ export class UsersService {
 		}
 	}
 
-	public getRuns(id: number, skip?: number): PagedResponse<UserRun[]> {
+	public getRuns(id: number, offset?: number): PagedResponse<UserRun[]> {
 		const response: UserRun[] = [];
 		let totalCount: number = 0;
 
