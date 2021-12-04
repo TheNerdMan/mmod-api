@@ -1,9 +1,9 @@
-import { Map } from "../models/map.model";
-import { PagedResponse } from "../dto/api-response.model";
+import { Map } from "../models/db/map.db";
+import { PagedResponseDto } from "../models/dto/api-response.dto";
 import { MapsDalc } from "../dalc/maps.dalc";
 
 export class MapsService {
-  	public getAll(offset?: number): PagedResponse<Map[]> {
+  	public getAll(offset?: number): PagedResponseDto<Map[]> {
 		const response: Map[] = [
 			{
 				id: 1,

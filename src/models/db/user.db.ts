@@ -1,4 +1,4 @@
-export interface User {
+export interface UserDB {
 	id: number;
 	steamID: string;
 	alias: string;
@@ -10,31 +10,25 @@ export interface User {
 	country: string;
 }
 
-export interface UserProfile extends User{		
+export interface UserProfileDB extends UserDB{		
   	bio: string;
 }
-export interface UserActivity {
+export interface UserActivityDB {
 	id: number;
-	type: Activity_Type;
+	type: number;
 	data: number;
 }
 
-export enum Activity_Type {
-	ALL = 0,
-	TIME_SUBMITTED = 1,
-	MAP_UPLOADED = 2,
-}
-
-export interface UserFollow extends User {		
+export interface UserFollowDB extends UserDB {		
 	notifyOn: number;
 }
 
-export interface UserCredit {		
+export interface UserCreditDB {		
 	id: number;
 	type: number;
 }
 
-export interface UserRun {		
+export interface UserRunDB {		
 	id: number;
 	track: number;
 	zoneNum: number;

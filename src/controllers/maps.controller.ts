@@ -6,8 +6,8 @@ import {
 	Route,
     Tags
 } from "tsoa";
-import { Map } from "../models/map.model";
-import { PagedResponse } from "../dto/api-response.model";
+import { Map } from "../models/db/map.db";
+import { PagedResponseDto } from "../models/dto/api-response.dto";
 import { MapsService } from "../services/maps.service";
 
 @Route("maps")
@@ -21,7 +21,7 @@ export class MapsController extends Controller {
      * @returns Returns all maps (100 at a time).
      */
 	@Get()
-	public async GetAllMaps(@Query() offset?: number): Promise<PagedResponse<Map[]>> {
+	public async GetAllMaps(@Query() offset?: number): Promise<PagedResponseDto<Map[]>> {
 		return new MapsService().getAll(offset);
 	}
 

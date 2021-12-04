@@ -1,4 +1,4 @@
-import { Map } from '../models/map.model';
+import { Map } from '../models/db/map.db';
 
 export class MapsDalc {
 
