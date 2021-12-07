@@ -1,18 +1,14 @@
-import {
-	Controller,
-	Get,
-	Path,
-	Query,
-	Route,
-    Tags
-} from "tsoa";
-import { Map } from "../models/db/map.db";
-import { PagedResponseDto } from "../models/dto/api-response.dto";
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { Map } from '@prisma/client';
+import { PagedResponseDto } from "../dto/api-response.dto";
 import { MapsService } from "../services/maps.service";
 
-@Route("maps")
-@Tags("Maps")
-export class MapsController extends Controller {
+@Controller("maps")
+@ApiTags("Maps")
+export class MapsController {
+
+	constructor(private readonly mapsService: MapsService) {}
 
     /**
      * Gets all maps.
@@ -21,8 +17,8 @@ export class MapsController extends Controller {
      * @returns Returns all maps (100 at a time).
      */
 	@Get()
-	public async GetAllMaps(@Query() offset?: number): Promise<PagedResponseDto<Map[]>> {
-		return new MapsService().getAll(offset);
+	public async GetAllMaps(@Query()skip?: number, @Query()take?: number): Promise<PagedResponseDto<Map[]>> {
+		return this.mapsService.getAll(skip, take);
 	}
 
     /**
@@ -32,7 +28,7 @@ export class MapsController extends Controller {
      * @returns Returns a single map.
      */
 	@Get("{mapID}")
-	public async GetMap(@Path() mapID: number): Promise<Map> {
-		return new MapsService().get(mapID);
+	public async GetMap(@Param() mapID: number): Promise<Map> {
+		return this.mapsService.get(mapID);
 	}
 }

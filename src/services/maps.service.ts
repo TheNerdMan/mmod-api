@@ -1,9 +1,12 @@
-import { Map } from "../models/db/map.db";
-import { PagedResponseDto } from "../models/dto/api-response.dto";
+import { Injectable } from '@nestjs/common';
+import { Map } from '@prisma/client';
+import { PagedResponseDto } from "../dto/api-response.dto";
 import { MapsDalc } from "../dalc/maps.dalc";
 
+@Injectable()
 export class MapsService {
-  	public getAll(offset?: number): PagedResponseDto<Map[]> {
+
+  	getAll(skip?: number, take?: number): PagedResponseDto<Map[]> {
 		const response: Map[] = [
 			{
 				id: 1,
@@ -30,7 +33,7 @@ export class MapsService {
 		}
 	}
 
-	public get(id: number): Map {
+	get(id: number): Map {
 		return {
 			id: 1,
 			downloadURL: "https://google.co.uk",

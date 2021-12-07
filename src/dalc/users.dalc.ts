@@ -1,18 +1,49 @@
-import { User } from '../models/user.model';
+import { Injectable } from '@nestjs/common';
+import { PrismaDalc } from './prisma.dalc';
+import {
+    User,
+    Prisma
+} from '@prisma/client';
 
+
+@Injectable()
 export class UserDalc {
-
+    constructor(private prisma: PrismaDalc) {}
 
     /**
      * @summary Inserts to database
      * @returns New db record ID
-    */ 
-    
-    static insert(newUser: User): number {
-        
-        // Go do something at database
-        newUser.id = Math.floor(Math.random() * 10000); // Random
+    */     
+    async Insert(
+        newUser: Prisma.UserCreateInput
+    ): Promise<number> {
 
-        return newUser.id;
+        const result = await this.prisma.user.create({
+            data: newUser
+        });
+
+        return result.id;
+    }
+
+    /**
+     * @summary Inserts to database
+     * @returns New db record ID
+    */     
+    async GetAll(
+        where?: Prisma.UserWhereInput,
+        skip?: number,
+        take?: number
+    ): Promise<[User[], number]> {
+        const count = await this.prisma.user.count({
+            where: where,
+            skip: skip,
+            take: take
+        })
+        const users = await this.prisma.user.findMany({                    
+            where: where,
+            skip: skip,
+            take: take
+        })
+        return [users, count]            
     }
 }

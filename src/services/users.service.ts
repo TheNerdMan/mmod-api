@@ -1,11 +1,11 @@
-import { UserDB, 
-	UserProfileDB, 
-	UserActivityDB, 
-	UserFollowDB, 
-	UserCreditDB, 
-	UserRunDB
-} from "../models/db/user.db";
-import { PagedResponseDto } from "../models/dto/api-response.dto";
+import {
+	Activity as ActivityDB, 
+	Follow as FollowDB, 
+	MapCredit as MapCreditDB, 
+	Run as RunDB
+} from '@prisma/client';
+import { UserDto, UserProfileDto } from "../dto/user.dto"
+import { PagedResponseDto } from "../dto/api-response.dto";
 import { UserDalc } from "../dalc/users.dalc";
 
 export class UsersService {
@@ -71,9 +71,9 @@ export class UsersService {
 		};
 	}
 
-	public getActivities(id: number, offset?: number): PagedResponseDto<UserActivityDB[]> {
-		const response: UserActivityDB[] = [];
-		let totalCount: number = 0;
+	public getActivities(id: number, skip?: number, take?: number): PagedResponseDto<ActivityDB[]> {
+		const response: ActivityDB[] = [];
+		let totalCount = 0;
 
 		// temp
 		totalCount = 100;
@@ -85,9 +85,9 @@ export class UsersService {
 		}
 	}
 
-	public getFollowers(id: number, offset?: number): PagedResponseDto<UserFollowDB[]> {
-		const response: UserFollowDB[] = [];
-		let totalCount: number = 0;
+	public getFollowers(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
+		const response: FollowDB[] = [];
+		let totalCount = 0;
 
 		// temp
 		totalCount = 100;
@@ -99,9 +99,9 @@ export class UsersService {
 		}
 	}
 
-	public getFollowed(id: number, offset?: number): PagedResponseDto<UserFollowDB[]> {
-		const response: UserFollowDB[] = [];
-		let totalCount: number = 0;
+	public getFollowed(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
+		const response: FollowDB[] = [];
+		let totalCount = 0;
 
 		// temp
 		totalCount = 100;
@@ -113,9 +113,9 @@ export class UsersService {
 		}
 	}
 
-	public getCredits(id: number, offset?: number): PagedResponseDto<UserCreditDB[]> {
-		const response: UserCreditDB[] = [];
-		let totalCount: number = 0;
+	public getCredits(id: number, skip?: number, take?: number): PagedResponseDto<MapCreditDB[]> {
+		const response: MapCreditDB[] = [];
+		let totalCount = 0;
 
 		// temp
 		totalCount = 100;
@@ -127,9 +127,9 @@ export class UsersService {
 		}
 	}
 
-	public getRuns(id: number, offset?: number): PagedResponseDto<UserRunDB[]> {
-		const response: UserRunDB[] = [];
-		let totalCount: number = 0;
+	public getRuns(id: number, skip?: number, take?: number): PagedResponseDto<RunDB[]> {
+		const response: RunDB[] = [];
+		let totalCount = 0;
 
 		// temp
 		totalCount = 100;

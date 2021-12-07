@@ -1,25 +1,21 @@
+import { Controller, Get, Param, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import {
-	Controller,
-	Get,
-	Path,
-	Query,
-	Route,
-	Tags
-} from "tsoa";
-import { 
-	UserDB, 
-	UserProfileDB, 
-	UserActivityDB, 
-	UserFollowDB, 
-	UserCreditDB, 
-	UserRunDB
-} from "../models/db/user.db";
-import { PagedResponseDto } from "../models/dto/api-response.dto";
+	Activity, 
+	Follow, 
+	MapCredit, 
+	Run
+} from '@prisma/client';
+import { UserDto, UserProfileDto } from "../dto/user.dto"
+import { PagedResponseDto } from "../dto/api-response.dto";
 import { UsersService } from "../services/users.service";
 
-@Route("users")
-@Tags("Users")
-export class UsersController extends Controller {
+@Controller("users")
+@ApiTags("Users")
+export class UsersController {
+
+	constructor(private readonly usersService: UsersService) {}
+
 	/**
 	 * Gets all users.
 	 * @param offset Offset this many records (paging).
@@ -27,8 +23,8 @@ export class UsersController extends Controller {
 	 * @returns Returns all users (100 at a time). 
 	 */
 	@Get()
-	public async GetAllUsers(@Query() offset?: number): Promise<PagedResponseDto<UserDB[]>> {
-		return new UsersService().getAll(offset);
+	public async GetAllUsers(@Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<UserDto[]>> {
+		return this.usersService.getAll(skip, take);
 	}
 
 	/**
@@ -38,8 +34,8 @@ export class UsersController extends Controller {
 	 * @returns Returns a single user.
 	 */
 	@Get("{userID}")
-	public async GetUser(@Path() userID: number): Promise<UserDB> {
-		return new UsersService().get(userID);
+	public async GetUser(@Param() userID: number): Promise<UserDto> {
+		return this.usersService.get(userID);
 	}
 
 	/**
@@ -49,8 +45,8 @@ export class UsersController extends Controller {
 	 * @returns Returns a single user's profile.
 	 */
 	@Get("{userID}/profile")
-	public async GetUserProfile(@Path() userID: number): Promise<UserProfileDB> {
-		return new UsersService().getProfile(userID);
+	public async GetUserProfile(@Param() userID: number): Promise<UserProfileDto> {
+		return this.usersService.getProfile(userID);
 	}
 
 	/**
@@ -62,8 +58,8 @@ export class UsersController extends Controller {
 	 * @returns Returns a list of a single user's activities (100 at a time).
 	 */
 	@Get("{userID}/activities")
-	public async GetActivities(@Path() userID: number, @Query() offset?: number): Promise<PagedResponseDto<UserActivityDB[]>> {
-		return new UsersService().getActivities(userID, offset);
+	public async GetActivities(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Activity[]>> {
+		return this.usersService.getActivities(userID, skip, take);
 	}
 
 	/**
@@ -75,8 +71,8 @@ export class UsersController extends Controller {
 	 * @returns Returns a list of a single user's followers (100 at a time).
 	 */
 	@Get("{userID}/followers")
-	public async GetFollowers(@Path() userID: number, @Query() offset?: number): Promise<PagedResponseDto<UserFollowDB[]>> {
-		return new UsersService().getFollowers(userID, offset);
+	public async GetFollowers(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Follow[]>> {
+		return this.usersService.getFollowers(userID, skip, take);
 	}
 
 	/**
@@ -88,8 +84,8 @@ export class UsersController extends Controller {
 	 * @returns Returns users that this user follows (100 at a time).
 	 */
 	@Get("{userID}/follows")
-	public async GetFollowed(@Path() userID: number, @Query() offset?: number): Promise<PagedResponseDto<UserFollowDB[]>> {
-		return new UsersService().getFollowed(userID, offset);
+	public async GetFollowed(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Follow[]>> {
+		return this.usersService.getFollowed(userID, skip, take);
 	}
 
 	/**
@@ -101,8 +97,8 @@ export class UsersController extends Controller {
 	 * @returns Returns a list of this user's credits (100 at a time).
 	 */
 	@Get("{userID}/credits")
-	public async GetCredits(@Path() userID: number, @Query() offset?: number): Promise<PagedResponseDto<UserCreditDB[]>> {
-		return new UsersService().getCredits(userID, offset);
+	public async GetCredits(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<MapCredit[]>> {
+		return this.usersService.getCredits(userID, skip, take);
 	}
 
 	/**
@@ -114,7 +110,7 @@ export class UsersController extends Controller {
 	 * @returns Returns a list of this user's runs (100 at a time).
 	 */
 	@Get("{userID}/runs")
-	public async GetRuns(@Path() userID: number, @Query() offset?: number): Promise<PagedResponseDto<UserRunDB[]>> {
-		return new UsersService().getRuns(userID, offset);
+	public async GetRuns(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Run[]>> {
+		return this.usersService.getRuns(userID, skip, take);
 	}
 }

@@ -1,17 +1,24 @@
-import { Map } from '../models/db/map.db';
+import { Injectable } from '@nestjs/common';
+import { PrismaDalc } from './prisma.dalc';
+import {
+    Map,
+    Prisma
+} from '@prisma/client';
 
+
+@Injectable()
 export class MapsDalc {
-
+    constructor(private prisma: PrismaDalc) {}
 
     /**
      * @summary Inserts to database
      * @returns New db record ID
     */ 
     
-    static insert(newMap: Map): number {
-        
-        // Go do something at database
-        newMap.id = Math.floor(Math.random() * 10000); // Random
+    async insert(newMap: Prisma.MapCreateInput): Promise<number> {
+        const result = await this.prisma.map.create({
+            data: newMap
+        });
 
         return newMap.id;
     }
