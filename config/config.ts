@@ -11,7 +11,7 @@ const configs: IAllConfigs = {
 		baseURL_Auth: 'http://localhost:30002',
 		baseURL_CDN: 'http://localhost:30002',
 		domain: 'localhost',
-		port: 30002,
+		port: 3000,
 		accessToken: {
 			secret: 'G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A',
 			expTime: '15m',
@@ -57,7 +57,7 @@ const configs: IAllConfigs = {
 		baseURL_Auth: 'http://localhost:30002',
 		baseURL_CDN: 'http://localhost:30002',
 		domain: 'localhost',
-		port: 30002,
+		port: 3000,
 		accessToken: {
 			secret: 'G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A',
 			expTime: '15m',
@@ -198,5 +198,4 @@ export interface IConfig {
 		};
 }
 
-// @ts-expect-error: We are using the enviroment string to get the config
-export const config: IConfig = configs[env];
+export const appConfig: IConfig = configs[env];

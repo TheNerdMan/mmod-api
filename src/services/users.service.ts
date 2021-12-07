@@ -1,3 +1,4 @@
+import { Injectable } from '@nestjs/common';   
 import {
 	Activity as ActivityDB, 
 	Follow as FollowDB, 
@@ -8,9 +9,10 @@ import { UserDto, UserProfileDto } from "../dto/user.dto"
 import { PagedResponseDto } from "../dto/api-response.dto";
 import { UserDalc } from "../dalc/users.dalc";
 
+@Injectable()
 export class UsersService {
-  	public getAll(offset?: number): PagedResponseDto<UserDB[]> {
-		const response: UserDB[] = [
+  	public getAll(skip?: number, take?: number): PagedResponseDto<UserDto[]> {
+		const response: UserDto[] = [
 			{
 				id: 1,
 				steamID: "steam:123",
@@ -20,7 +22,9 @@ export class UsersService {
 				avatarURL: "jane.jpg",
 				bans: 0,
 				roles: 1,
-				country: "UK"
+				country: "UK",
+				createdAt: new Date,
+				updatedAt: new Date
 			},
 			{
 				id: 2,
@@ -31,7 +35,9 @@ export class UsersService {
 				avatarURL: "john.jpg",
 				bans: 1,
 				roles: 0,
-				country: "US"
+				country: "US",
+				createdAt: new Date,
+				updatedAt: new Date
 			}
 		]
 
@@ -42,7 +48,7 @@ export class UsersService {
 		}
 	}
 
-	public get(id: number): UserDB {
+	public get(id: number): UserDto {
 		return {
 			id: 1,
 			steamID: "steam:123",
@@ -52,13 +58,16 @@ export class UsersService {
 			avatarURL: "jane.jpg",
 			bans: 0,
 			roles: 1,
-			country: "UK"
+			country: "UK",			
+			createdAt: new Date,
+			updatedAt: new Date
 		};
 	}
 
-	public getProfile(id: number): UserProfileDB {
+	public getProfile(id: number): UserProfileDto {
 		return {
 			id: 1,
+			userID: 1,
 			steamID: "steam:123",
 			bio: "combat surf best fight me",
 			alias: "jane",
@@ -67,7 +76,10 @@ export class UsersService {
 			avatarURL: "jane.jpg",
 			bans: 0,
 			roles: 1,
-			country: "UK"
+			country: "UK",	
+			featuredBadgeID: 1,
+			createdAt: new Date,
+			updatedAt: new Date
 		};
 	}
 

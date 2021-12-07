@@ -10,7 +10,7 @@ import {
 export class MapsDalc {
     constructor(private prisma: PrismaDalc) {}
 
-    /**
+      /**
      * @summary Inserts to database
      * @returns New db record ID
     */ 
@@ -20,6 +20,6 @@ export class MapsDalc {
             data: newMap
         });
 
-        return newMap.id;
+        return result.id;
     }
 }

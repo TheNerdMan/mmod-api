@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import {
 	Activity, 
 	Follow, 
@@ -16,101 +16,165 @@ export class UsersController {
 
 	constructor(private readonly usersService: UsersService) {}
 
-	/**
-	 * Gets all users.
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns all users (100 at a time). 
-	 */
 	@Get()
-	public async GetAllUsers(@Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<UserDto[]>> {
+	@ApiOperation({ summary: "Returns all users" })
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetAllUsers(@Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<UserDto[]>> {
 		return this.usersService.getAll(skip, take);
 	}
 
-	/**
-	 * Gets a specific user.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @returns Returns a single user.
-	 */
-	@Get("{userID}")
-	public async GetUser(@Param() userID: number): Promise<UserDto> {
+	@Get(":userID")	
+	@ApiOperation({ summary: "Returns single user" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	public async GetUser(@Param('userID') userID: number): Promise<UserDto> {
 		return this.usersService.get(userID);
 	}
 
-	/**
-	 * Gets a specific user's profile.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @returns Returns a single user's profile.
-	 */
-	@Get("{userID}/profile")
-	public async GetUserProfile(@Param() userID: number): Promise<UserProfileDto> {
+	@Get(":userID/profile")
+	@ApiOperation({ summary: "Returns single user's profile" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	public async GetUserProfile(@Param('userID') userID: number): Promise<UserProfileDto> {
 		return this.usersService.getProfile(userID);
 	}
 
-	/**
-	 * Gets a specific user's activities.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns a list of a single user's activities (100 at a time).
-	 */
-	@Get("{userID}/activities")
-	public async GetActivities(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Activity[]>> {
+	@Get(":userID/activities")	
+	@ApiOperation({ summary: "Returns all of a single user's activities" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetActivities(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Activity[]>> {
 		return this.usersService.getActivities(userID, skip, take);
 	}
 
-	/**
-	 * Gets a specific user's followers.
-	 * @param userID Target user ID.
-     * @isInt userID 
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns a list of a single user's followers (100 at a time).
-	 */
-	@Get("{userID}/followers")
-	public async GetFollowers(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Follow[]>> {
+	@Get(":userID/followers")
+	@ApiOperation({ summary: "Returns all of a single user's followers" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetFollowers(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Follow[]>> {
 		return this.usersService.getFollowers(userID, skip, take);
 	}
 
-	/**
-	 * Gets all users that a user follows.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns users that this user follows (100 at a time).
-	 */
-	@Get("{userID}/follows")
-	public async GetFollowed(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Follow[]>> {
+	@Get(":userID/follows")
+	@ApiOperation({ summary: "Returns all of a single user's followed objects" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetFollowed(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Follow[]>> {
 		return this.usersService.getFollowed(userID, skip, take);
 	}
 
-	/**
-	 * Gets all of a user's credits.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns a list of this user's credits (100 at a time).
-	 */
-	@Get("{userID}/credits")
-	public async GetCredits(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<MapCredit[]>> {
+	@Get(":userID/credits")
+	@ApiOperation({ summary: "Returns all of a single user's credits" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetCredits(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<MapCredit[]>> {
 		return this.usersService.getCredits(userID, skip, take);
 	}
 
-	/**
-	 * Gets all of a user's runs.
-	 * @param userID Target user ID.
-     * @isInt userID
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-	 * @returns Returns a list of this user's runs (100 at a time).
-	 */
-	@Get("{userID}/runs")
-	public async GetRuns(@Param() userID: number, @Query() skip?: number, @Query() take?: number): Promise<PagedResponseDto<Run[]>> {
+	@Get(":userID/runs")
+	@ApiOperation({ summary: "Returns all of a single user's runs" })
+	@ApiQuery({
+		name: "userID",
+		type: Number,
+		description: "Target User ID",
+		required: true
+	})
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetRuns(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Run[]>> {
 		return this.usersService.getRuns(userID, skip, take);
 	}
 }

@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { Map } from '@prisma/client';
 import { PagedResponseDto } from "../dto/api-response.dto";
 import { MapsService } from "../services/maps.service";
@@ -10,25 +10,33 @@ export class MapsController {
 
 	constructor(private readonly mapsService: MapsService) {}
 
-    /**
-     * Gets all maps.
-	 * @param offset Offset this many records (paging).
-     * @isInt offset
-     * @returns Returns all maps (100 at a time).
-     */
 	@Get()
-	public async GetAllMaps(@Query()skip?: number, @Query()take?: number): Promise<PagedResponseDto<Map[]>> {
+	@ApiOperation({ summary: "Returns all maps" })
+	@ApiQuery({
+		name: "skip",
+		type: Number,
+		description: "Offset this many records",
+		required: false
+	})
+	@ApiQuery({
+		name: "take",
+		type: Number,
+		description: "Take this many records",
+		required: false
+	})
+	public async GetAllMaps(@Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Map[]>> {
 		return this.mapsService.getAll(skip, take);
 	}
 
-    /**
-     * Gets a specific map.
-	 * @param mapID Target map ID.
-     * @isInt mapID
-     * @returns Returns a single map.
-     */
-	@Get("{mapID}")
-	public async GetMap(@Param() mapID: number): Promise<Map> {
+	@Get(":mapID")	
+	@ApiOperation({ summary: "Returns a single map" })
+	@ApiQuery({
+		name: "mapID",
+		type: Number,
+		description: "Target Map ID",
+		required: true
+	})
+	public async GetMap(@Param('mapID') mapID: number): Promise<Map> {
 		return this.mapsService.get(mapID);
 	}
 }
