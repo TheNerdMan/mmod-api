@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import {
 	Activity, 
 	Follow, 
@@ -17,7 +17,7 @@ export class UsersController {
 	constructor(private readonly usersService: UsersService) {}
 
 	@Get()
-	@ApiOperation({ summary: "Returns all users" })
+	@ApiOperation({ summary: "Returns all users" })	
 	@ApiQuery({
 		name: "skip",
 		type: Number,

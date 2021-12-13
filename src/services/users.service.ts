@@ -12,6 +12,7 @@ import { UserDalc } from "../dalc/users.dalc";
 @Injectable()
 export class UsersService {
   	public getAll(skip?: number, take?: number): PagedResponseDto<UserDto[]> {
+		  
 		const response: UserDto[] = [
 			{
 				id: 1,
@@ -49,6 +50,22 @@ export class UsersService {
 	}
 
 	public get(id: number): UserDto {
+		return {
+			id: 1,
+			steamID: "steam:123",
+			alias: "jane",
+			aliasLocked: true,
+			avatar: "jane.jpg",
+			avatarURL: "jane.jpg",
+			bans: 0,
+			roles: 1,
+			country: "UK",			
+			createdAt: new Date,
+			updatedAt: new Date
+		};
+	}
+
+	public getBySteamID(id: string): UserDto {
 		return {
 			id: 1,
 			steamID: "steam:123",
