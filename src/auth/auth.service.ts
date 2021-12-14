@@ -1,5 +1,6 @@
 import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { UsersService } from '../services/users.service';
 import { appConfig } from '../../config/config';
@@ -10,6 +11,7 @@ export class AuthService {
 
     constructor(
         private userService: UsersService,
+        private jwtService: JwtService,
         private http: HttpService) {
     }
     
@@ -42,7 +44,7 @@ export class AuthService {
 
         if (sres.data.response.params.result === 'OK') {
             if (idToVerify === sres.data.response.params.steamid) {
-                const user: User = this.userService.findOrCreateFromGame(idToVerify);
+                const user = await this.userService.FindOrCreateFromGame(idToVerify);
                 const token = await this.genAccessToken(user, true);
                 return token;                                   
             } else {
@@ -55,12 +57,12 @@ export class AuthService {
 
 	async createRefreshToken(user: User, gameAuth: boolean): Promise<string> {
         const refreshToken = await this.genRefreshToken(user.id, gameAuth);
-        await this.userService.updateRefreshToken(refreshToken, user.id);
+        await this.userService.UpdateRefreshToken(refreshToken, user.id);
 		return Promise.resolve(refreshToken)
 	}
 
 	async refreshToken(userID: number, refreshToken: string): Promise<string> {
-		const user = await this.userService.refreshToken(userID, refreshToken);
+		const user = await this.userService.RefreshToken(userID, refreshToken);
         if (user)
             return this.genAccessToken(user);
 
@@ -68,10 +70,10 @@ export class AuthService {
 	}
 
 	async revokeToken(userID: number): Promise<void> {
-		await this.userService.update(userID,{ refreshToken: '' });
+		await this.userService.Update(userID,{ refreshToken: '' });
 	}
 
-	async genAccessToken(usr: User, gameAuth: boolean): Promise<string> {
+	async genAccessToken(usr: User, gameAuth?: boolean): Promise<string> {
 		const payload = {
 			id: usr.id,
 			steamID: usr.steamID,
@@ -85,22 +87,26 @@ export class AuthService {
                 appConfig.accessToken.gameExpTime
 				: appConfig.accessToken.expTime,
 		};
-		return await createJWT(payload, appConfig.accessToken.secret, options);
+		return await this.jwtService.sign(payload, options);
 	}
 
-	async genRefreshToken(userID: number): Promise<string> {
+	async genRefreshToken(userID: number, gameAuth?: boolean): Promise<string> {
 		const payload = {
 			id: userID,
 		}
 		const options = {
 			issuer: appConfig.domain,
+			expiresIn: gameAuth ?
+                appConfig.accessToken.gameRefreshExpTime
+				: appConfig.accessToken.refreshExpTime,
 		}
-		return await createJWT(payload, appConfig.accessToken.secret, options);
+		return await this.jwtService.sign(payload, options);
 	}
 
-	async verifyToken(token: string): Promise<string> {
+    // TODO: Type response
+	async verifyToken(token: string): Promise<any> {
         try {
-		    return await verifyJWT(token, appConfig.accessToken.secret)
+		    return this.jwtService.verify(token);
         } catch(err) {
 			const clientErrors = ['TokenExpiredError','JsonWebTokenError','NotBeforeError'];
 			if (clientErrors.includes(err.name)) {
