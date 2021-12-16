@@ -15,7 +15,7 @@ export class AuthService {
         private http: HttpService) {
     }
     
-    async validateSteam(userTicketRaw: string, idToVerify: number): Promise<string> {
+    async validateSteam(userTicketRaw: string, idToVerify: string): Promise<string> {
 		const userTicket = Buffer.from(userTicketRaw, 'utf8').toString('hex');
 
         const requestConfig = {
@@ -45,7 +45,7 @@ export class AuthService {
         if (sres.data.response.params.result === 'OK') {
             if (idToVerify === sres.data.response.params.steamid) {
                 const user = await this.userService.FindOrCreateFromGame(idToVerify);
-                const token = await this.genAccessToken(user, true);
+                const token = await this.GenAccessToken(user, true);
                 return token;                                   
             } else {
                 throw new UnauthorizedException(); // Generate an error here
@@ -55,25 +55,25 @@ export class AuthService {
         }
     }
 
-	async createRefreshToken(user: User, gameAuth: boolean): Promise<string> {
-        const refreshToken = await this.genRefreshToken(user.id, gameAuth);
-        await this.userService.UpdateRefreshToken(refreshToken, user.id);
+	async CreateRefreshToken(user: User, gameAuth: boolean): Promise<string> {
+        const refreshToken = await this.GenRefreshToken(user.id, gameAuth);
+        await this.userService.UpdateRefreshToken(user.id, refreshToken);
 		return Promise.resolve(refreshToken)
 	}
 
-	async refreshToken(userID: number, refreshToken: string): Promise<string> {
-		const user = await this.userService.RefreshToken(userID, refreshToken);
+	async RefreshToken(userID: number, refreshToken: string): Promise<string> {
+		const user = await this.VerifyRefreshToken(userID, refreshToken);
         if (user)
-            return this.genAccessToken(user);
+            return this.GenAccessToken(user);
 
         throw new HttpException('Forbidden', 401);
 	}
 
-	async revokeToken(userID: number): Promise<void> {
-		await this.userService.Update(userID,{ refreshToken: '' });
+	async RevokeToken(userID: number): Promise<void> {
+		await this.userService.UpdateRefreshToken(userID,'');
 	}
 
-	async genAccessToken(usr: User, gameAuth?: boolean): Promise<string> {
+	async GenAccessToken(usr: User, gameAuth?: boolean): Promise<string> {
 		const payload = {
 			id: usr.id,
 			steamID: usr.steamID,
@@ -90,7 +90,7 @@ export class AuthService {
 		return await this.jwtService.sign(payload, options);
 	}
 
-	async genRefreshToken(userID: number, gameAuth?: boolean): Promise<string> {
+	async GenRefreshToken(userID: number, gameAuth?: boolean): Promise<string> {
 		const payload = {
 			id: userID,
 		}
@@ -104,7 +104,7 @@ export class AuthService {
 	}
 
     // TODO: Type response
-	async verifyToken(token: string): Promise<any> {
+	async VerifyToken(token: string): Promise<any> {
         try {
 		    return this.jwtService.verify(token);
         } catch(err) {
@@ -115,4 +115,12 @@ export class AuthService {
 		}
 	}
 
+    async VerifyRefreshToken(userID: number, refreshToken: string): Promise<User> {
+        const userAuth = await this.userService.GetAuth(userID);        
+        if(userAuth.refreshToken == refreshToken) {
+            return this.userService.Get(userID);            
+        } else {
+            return;
+        }        
+	}
 }

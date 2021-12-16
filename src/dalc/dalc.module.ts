@@ -7,13 +7,12 @@ import { UserDalc } from './users.dalc';
 @Module({
   providers: [
     PrismaDalc,
+    UserDalc,
     MapsDalc,
-    UserDalc
   ],
-  exports: [
-    PrismaDalc,
+  exports: [    
+    UserDalc,
     MapsDalc,
-    UserDalc
   ]
 })
 export class DalcModule {}

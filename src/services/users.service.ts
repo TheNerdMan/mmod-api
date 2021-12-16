@@ -1,5 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';   
-import { HttpService } from '@nestjs/axios';
+import { HttpException, Injectable } from '@nestjs/common';  
 import {
 	Activity as ActivityDB, 
 	Follow as FollowDB, 
@@ -7,24 +6,25 @@ import {
 	Prisma, 
 	Run as RunDB,
 	User,
+	UserAuth,
 } from '@prisma/client';
 import { UserDto, UserProfileDto } from "../dto/user.dto"
 import { PagedResponseDto } from "../dto/api-response.dto";
 import { UserDalc } from "../dalc/users.dalc";
 import { appConfig } from 'config/config';
 import { lastValueFrom, map } from 'rxjs';
-import { Parser, parserDefaults } from 'xml2ts';
+import * as xml2js from 'xml2js';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class UsersService {
-  
 	constructor(
-		private http: HttpService,
 		private userDalc: UserDalc,
+		private http: HttpService,
 	){}
 
 	//#region GETs
-  	public getAll(skip?: number, take?: number): PagedResponseDto<UserDto[]> {
+  	public GetAll(skip?: number, take?: number): PagedResponseDto<UserDto[]> {
 		  
 		const response: UserDto[] = [
 			{
@@ -62,7 +62,7 @@ export class UsersService {
 		}
 	}
 
-	public get(id: number): UserDto {
+	public Get(id: number): UserDto {
 		return {
 			id: 1,
 			steamID: "steam:123",
@@ -78,7 +78,7 @@ export class UsersService {
 		};
 	}
 
-	public getBySteamID(id: string): UserDto {
+	public GetBySteamID(id: string): UserDto {
 		return {
 			id: 1,
 			steamID: "steam:123",
@@ -94,7 +94,7 @@ export class UsersService {
 		};
 	}
 
-	public getProfile(id: number): UserProfileDto {
+	public GetProfile(id: number): UserProfileDto {
 		return {
 			id: 1,
 			userID: 1,
@@ -113,7 +113,7 @@ export class UsersService {
 		};
 	}
 
-	public getActivities(id: number, skip?: number, take?: number): PagedResponseDto<ActivityDB[]> {
+	public GetActivities(id: number, skip?: number, take?: number): PagedResponseDto<ActivityDB[]> {
 		const response: ActivityDB[] = [];
 		let totalCount = 0;
 
@@ -127,7 +127,7 @@ export class UsersService {
 		}
 	}
 
-	public getFollowers(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
+	public GetFollowers(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
 		const response: FollowDB[] = [];
 		let totalCount = 0;
 
@@ -141,7 +141,7 @@ export class UsersService {
 		}
 	}
 
-	public getFollowed(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
+	public GetFollowed(id: number, skip?: number, take?: number): PagedResponseDto<FollowDB[]> {
 		const response: FollowDB[] = [];
 		let totalCount = 0;
 
@@ -155,7 +155,7 @@ export class UsersService {
 		}
 	}
 
-	public getCredits(id: number, skip?: number, take?: number): PagedResponseDto<MapCreditDB[]> {
+	public GetCredits(id: number, skip?: number, take?: number): PagedResponseDto<MapCreditDB[]> {
 		const response: MapCreditDB[] = [];
 		let totalCount = 0;
 
@@ -169,7 +169,7 @@ export class UsersService {
 		}
 	}
 
-	public getRuns(id: number, skip?: number, take?: number): PagedResponseDto<RunDB[]> {
+	public GetRuns(id: number, skip?: number, take?: number): PagedResponseDto<RunDB[]> {
 		const response: RunDB[] = [];
 		let totalCount = 0;
 
@@ -182,23 +182,31 @@ export class UsersService {
 			response: response
 		}
 	}
+
+    async GetAuth(userID: number): Promise<UserAuth> {
+		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+		whereInput.id = userID;
+        return await this.userDalc.GetAuth(whereInput);
+    }
+  
 	//#endregion
 
-	async UpdateRefreshToken(refreshToken: string, id: number): Promise<User> {
-		throw new Error('Method not implemented.');
-    }
-	async RefreshToken(userID: number, refreshToken: string): Promise<User> {
-		const updateInput: Prisma.UserAuthUpdateInput = {};
-		updateInput.refreshToken = refreshToken;
-        return this.userDalc.UpdateAuth(userID, updateInput);
-    }
-	async Update(userID: number, updateInput: UserUpdateInput): Promise<User> {
-        throw new Error('Method not implemented.');
-    }
+	//#region Find or create
+
 	async FindOrCreateFromGame(steamID: string): Promise<User> {
 		const data = {
-			summaries: {},
-			xmlData: {},
+			summaries: {
+				profilestate: {},
+				steamid: '',
+				personaname: '',
+				avatarfull: '',
+				locccountrycode: ''
+			},
+			xmlData: {
+				profile: {
+					isLimitedAccount:[]
+				}
+			},
 		};
 
 		const getPlayerResponse = await lastValueFrom(
@@ -226,8 +234,7 @@ export class UsersService {
 		const getSteamProfileResponse = await lastValueFrom(
 			this.http.get(`https://steamcommunity.com/profiles/${steamID}?xml=1`).pipe(
 				map(async (res) => {
-					const parser = new Parser(parserDefaults);
-					return await parser.parseString(res.data);
+					return await xml2js.parseStringPromise(res.data);
 				})
 			)
 		)
@@ -276,12 +283,32 @@ export class UsersService {
 
 		return this.FindOrCreateFromSteamID(profile);
 	}
+	//#endregion
+	
+	//#region Update
+	async UpdateUser(userID: number, updateInput: Prisma.UserUpdateInput): Promise<User> {
+		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+		whereInput.id = userID;
+        return await this.userDalc.Update(whereInput, updateInput);
+    }
 
-	async FindOrCreateFromSteamID(profile: UserDto): Promise<User> {
-		const whereInput: Prisma.UserWhereInput = {};
+	async UpdateRefreshToken(userID: number, refreshToken: string): Promise<UserAuth> {
+		const updateInput: Prisma.UserAuthUpdateInput = {};
+		updateInput.refreshToken = refreshToken;
+		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+		whereInput.id = userID;
+        return await this.userDalc.UpdateAuth(whereInput, updateInput);
+    }
+
+	//#endregion
+
+	//#region Private
+
+	private async FindOrCreateFromSteamID(profile: UserDto): Promise<User> {
+		const whereInput: Prisma.UserWhereUniqueInput = {};
 		whereInput.steamID = profile.steamID;
 
-		const user = await this.userDalc.FindOne(whereInput)
+		const user = await this.userDalc.Get(whereInput)
 
 		if(user){
 			const updateInput: Prisma.UserUpdateInput = {};
@@ -290,7 +317,10 @@ export class UsersService {
 			updateInput.country = profile.country;
 			updateInput.updatedAt = new Date();
 
-			return this.userDalc.Update(user.ID, updateInput)
+			const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+			whereInput.id = user.id;
+
+			return this.userDalc.Update(whereInput, updateInput)
 		} else {
 			const createInput: Prisma.UserCreateInput = {
 				createdAt: new Date(),
@@ -304,4 +334,6 @@ export class UsersService {
 			return this.userDalc.Insert(createInput);
 		}
 	}
+
+	//#endregion
 }

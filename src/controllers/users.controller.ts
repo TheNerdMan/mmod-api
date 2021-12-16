@@ -31,7 +31,7 @@ export class UsersController {
 		required: false
 	})
 	public async GetAllUsers(@Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<UserDto[]>> {
-		return this.usersService.getAll(skip, take);
+		return this.usersService.GetAll(skip, take);
 	}
 
 	@Get(":userID")	
@@ -43,7 +43,7 @@ export class UsersController {
 		required: true
 	})
 	public async GetUser(@Param('userID') userID: number): Promise<UserDto> {
-		return this.usersService.get(userID);
+		return this.usersService.Get(userID);
 	}
 
 	@Get(":userID/profile")
@@ -55,7 +55,7 @@ export class UsersController {
 		required: true
 	})
 	public async GetUserProfile(@Param('userID') userID: number): Promise<UserProfileDto> {
-		return this.usersService.getProfile(userID);
+		return this.usersService.GetProfile(userID);
 	}
 
 	@Get(":userID/activities")	
@@ -79,7 +79,7 @@ export class UsersController {
 		required: false
 	})
 	public async GetActivities(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Activity[]>> {
-		return this.usersService.getActivities(userID, skip, take);
+		return this.usersService.GetActivities(userID, skip, take);
 	}
 
 	@Get(":userID/followers")
@@ -103,7 +103,7 @@ export class UsersController {
 		required: false
 	})
 	public async GetFollowers(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Follow[]>> {
-		return this.usersService.getFollowers(userID, skip, take);
+		return this.usersService.GetFollowers(userID, skip, take);
 	}
 
 	@Get(":userID/follows")
@@ -127,7 +127,7 @@ export class UsersController {
 		required: false
 	})
 	public async GetFollowed(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Follow[]>> {
-		return this.usersService.getFollowed(userID, skip, take);
+		return this.usersService.GetFollowed(userID, skip, take);
 	}
 
 	@Get(":userID/credits")
@@ -151,7 +151,7 @@ export class UsersController {
 		required: false
 	})
 	public async GetCredits(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<MapCredit[]>> {
-		return this.usersService.getCredits(userID, skip, take);
+		return this.usersService.GetCredits(userID, skip, take);
 	}
 
 	@Get(":userID/runs")
@@ -175,6 +175,6 @@ export class UsersController {
 		required: false
 	})
 	public async GetRuns(@Param('userID') userID: number, @Query('skip') skip?: number, @Query('take') take?: number): Promise<PagedResponseDto<Run[]>> {
-		return this.usersService.getRuns(userID, skip, take);
+		return this.usersService.GetRuns(userID, skip, take);
 	}
 }

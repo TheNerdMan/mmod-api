@@ -13,9 +13,11 @@ const configs: IAllConfigs = {
 		domain: 'localhost',
 		port: 3000,
 		accessToken: {
-			secret: 'G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A',
+			secret: 'test',
 			expTime: '15m',
-			gameExpTime: '24h'
+			gameExpTime: '24h',
+			refreshExpTime: '5d',
+			gameRefreshExpTime: '5d'
 		},
 		discord: {
 			clientID: 'discord1234',
@@ -59,9 +61,11 @@ const configs: IAllConfigs = {
 		domain: 'localhost',
 		port: 3000,
 		accessToken: {
-			secret: 'G-KaNdRgUkXp2s5v8y/B?E(H+MbQeShVmYq3t6w9z$C&F)J@NcRfUjWnZr4u7x!A',
+			secret: 'development',
 			expTime: '15m',
-			gameExpTime: '24h'
+			gameExpTime: '24h',
+			refreshExpTime: '5d',
+			gameRefreshExpTime: '5d'
 		},
 		discord: {
 			clientID: process.env.DISCORD_CLIENT_ID ?? "undefined",
@@ -107,7 +111,9 @@ const configs: IAllConfigs = {
 		accessToken: {
 			secret: process.env.JWT_SECRET ?? "undefined",
 			expTime: '15m',
-			gameExpTime: '24h'
+			gameExpTime: '24h',
+			refreshExpTime: '5d',
+			gameRefreshExpTime: '5d'
 		},
 		discord: {
 			clientID: process.env.DISCORD_CLIENT_ID ?? "undefined",
@@ -163,6 +169,8 @@ export interface IConfig {
 			secret: string;
 			expTime: string;
 			gameExpTime: string;
+			refreshExpTime: string;
+			gameRefreshExpTime: string;
 		},
 		discord: {
 			clientID: string;

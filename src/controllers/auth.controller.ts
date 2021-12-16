@@ -1,6 +1,7 @@
-import { Body, Controller, Get, HttpException, Param, Redirect } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, Param } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Public } from 'src/app.module';
+import * as passport from 'passport';
+import { Public } from '../auth/public.decorator';
 import { AuthService } from '../auth/auth.service';
 
 @Controller("auth")
@@ -12,21 +13,21 @@ export class AuthController {
     @ApiOperation({summary: "Authenticates using steam"}) 
     @Get("steam") 
     @Public()
-    public AuthSteam(): string {
-        return 'token';
+    public AuthSteam(): void {
+        passport.authenticate('steam', {failureRedirect: '/', successRedirect: '/steam/return'})
     }
 
-    @ApiOperation({summary: "Return url from steam"}) 
+    @ApiOperation({summary: "Return url from steam, validate and return valid JWT"}) 
     @Get("steam/return") 
     @Public()
-    public ReturnFromSteam(): void {
-        Redirect('www.google.com');
+    public async ReturnFromSteam(@Body() body: any): Promise<any> {
+        return body;
     }
 
     @ApiOperation({summary: "Gets the JWT using a steam user ticket"}) 
     @Get("steam/user") 
     @Public()
-    public async GetUserFromSteam(@Param('userID') userID: number, @Body() userTicketRaw?: string): Promise<string> {
+    public async GetUserFromSteam(@Param('userID') userID: string, @Body() userTicketRaw?: string): Promise<string> {
         const jwt = await this.authService.validateSteam(userTicketRaw, userID);
         if (!jwt) { throw new HttpException("Error validtating Steam user ticket", 500) }
         return jwt;
