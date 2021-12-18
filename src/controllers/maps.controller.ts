@@ -4,7 +4,7 @@ import { Map } from '@prisma/client';
 import { PagedResponseDto } from "../dto/api-response.dto";
 import { MapsService } from "../services/maps.service";
 
-@Controller("maps")
+@Controller("api/v1/maps")
 @ApiTags("Maps")
 export class MapsController {
 

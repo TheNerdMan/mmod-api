@@ -10,7 +10,7 @@ import { UserDto, UserProfileDto } from "../dto/user.dto"
 import { PagedResponseDto } from "../dto/api-response.dto";
 import { UsersService } from "../services/users.service";
 
-@Controller("users")
+@Controller("api/v1/users")
 @ApiTags("Users")
 export class UsersController {
 

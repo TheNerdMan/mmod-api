@@ -6,10 +6,10 @@ const rootPath = path.normalize(__dirname + '/..'),
 const configs: IAllConfigs = {
 	test: {
 		root: rootPath,
-		baseURL: 'http://localhost:30002',
-		baseURL_API: 'http://localhost:30002',
-		baseURL_Auth: 'http://localhost:30002',
-		baseURL_CDN: 'http://localhost:30002',
+		baseURL: 'http://localhost:3000',
+		baseURL_API: 'http://localhost:3000',
+		baseURL_Auth: 'http://localhost:3000',
+		baseURL_CDN: 'http://localhost:3000',
 		domain: 'localhost',
 		port: 3000,
 		accessToken: {
@@ -54,10 +54,10 @@ const configs: IAllConfigs = {
 	},
 	development: {
 		root: rootPath,
-		baseURL: 'http://localhost:30002',
-		baseURL_API: 'http://localhost:30002',
-		baseURL_Auth: 'http://localhost:30002',
-		baseURL_CDN: 'http://localhost:30002',
+		baseURL: 'http://localhost:3000',
+		baseURL_API: 'http://localhost:3000',
+		baseURL_Auth: 'http://localhost:3000',
+		baseURL_CDN: 'http://localhost:3000',
 		domain: 'localhost',
 		port: 3000,
 		accessToken: {
