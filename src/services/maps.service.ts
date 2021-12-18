@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Map } from '@prisma/client';
 import { PagedResponseDto } from "../dto/api-response.dto";
-import { MapsDalc } from "../dalc/maps.dalc";
+import { MapsRepo } from "../repositories/maps.repo";
 
 @Injectable()
 export class MapsService {

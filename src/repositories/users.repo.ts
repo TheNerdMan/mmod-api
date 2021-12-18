@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaDalc } from './prisma.dalc';
+import { PrismaRepo } from './prisma.repo';
 import {
     User,
     Prisma,
@@ -8,8 +8,8 @@ import {
 
 
 @Injectable()
-export class UserDalc {
-    constructor(private prisma: PrismaDalc) {}
+export class UserRepo {
+    constructor(private prisma: PrismaRepo) {}
 
     /**
      * @summary Inserts to database

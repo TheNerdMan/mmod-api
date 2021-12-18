@@ -2,7 +2,7 @@ import { INestApplication, Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class PrismaDalc extends PrismaClient
+export class PrismaRepo extends PrismaClient
   implements OnModuleInit {
 
   async onModuleInit() {

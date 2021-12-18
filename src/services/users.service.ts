@@ -10,7 +10,7 @@ import {
 } from '@prisma/client';
 import { UserDto, UserProfileDto } from "../dto/user.dto"
 import { PagedResponseDto } from "../dto/api-response.dto";
-import { UserDalc } from "../dalc/users.dalc";
+import { UserRepo as UserRepo } from "../repositories/users.repo";
 import { appConfig } from 'config/config';
 import { lastValueFrom, map } from 'rxjs';
 import * as xml2js from 'xml2js';
@@ -19,8 +19,8 @@ import { HttpService } from '@nestjs/axios';
 @Injectable()
 export class UsersService {
 	constructor(
-		private userDalc: UserDalc,
-		private http: HttpService,
+		private readonly userRepo: UserRepo,
+		private readonly http: HttpService,
 	){}
 
 	//#region GETs
@@ -186,7 +186,7 @@ export class UsersService {
     async GetAuth(userID: number): Promise<UserAuth> {
 		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
 		whereInput.id = userID;
-        return await this.userDalc.GetAuth(whereInput);
+        return await this.userRepo.GetAuth(whereInput);
     }
   
 	//#endregion
@@ -289,7 +289,7 @@ export class UsersService {
 	async UpdateUser(userID: number, updateInput: Prisma.UserUpdateInput): Promise<User> {
 		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
 		whereInput.id = userID;
-        return await this.userDalc.Update(whereInput, updateInput);
+        return await this.userRepo.Update(whereInput, updateInput);
     }
 
 	async UpdateRefreshToken(userID: number, refreshToken: string): Promise<UserAuth> {
@@ -297,7 +297,7 @@ export class UsersService {
 		updateInput.refreshToken = refreshToken;
 		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
 		whereInput.id = userID;
-        return await this.userDalc.UpdateAuth(whereInput, updateInput);
+        return await this.userRepo.UpdateAuth(whereInput, updateInput);
     }
 
 	//#endregion
@@ -308,7 +308,7 @@ export class UsersService {
 		const whereInput: Prisma.UserWhereUniqueInput = {};
 		whereInput.steamID = profile.steamID;
 
-		const user = await this.userDalc.Get(whereInput)
+		const user = await this.userRepo.Get(whereInput)
 
 		if(user){
 			const updateInput: Prisma.UserUpdateInput = {};
@@ -320,7 +320,7 @@ export class UsersService {
 			const whereInput: Prisma.UserAuthWhereUniqueInput = {};
 			whereInput.id = user.id;
 
-			return this.userDalc.Update(whereInput, updateInput)
+			return this.userRepo.Update(whereInput, updateInput)
 		} else {
 			const createInput: Prisma.UserCreateInput = {
 				createdAt: new Date(),
@@ -331,7 +331,7 @@ export class UsersService {
 			createInput.avatar = profile.avatarURL;
 			createInput.country = profile.country;
 
-			return this.userDalc.Insert(createInput);
+			return this.userRepo.Insert(createInput);
 		}
 	}
 

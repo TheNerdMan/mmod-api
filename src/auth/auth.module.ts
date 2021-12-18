@@ -5,25 +5,31 @@ import { AuthService } from './auth.service';
 
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
-import { UsersService } from '../services/users.service';
 import { appConfig } from 'config/config';
 import { JwtModule } from '@nestjs/jwt';
+import { ServiceModule } from '../services/sevices.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    UsersService,
     PassportModule,  
     JwtModule.register({
         secret: appConfig.accessToken.secret, signOptions: {
             expiresIn: appConfig.accessToken.expTime,
         },
     }),
+    ServiceModule,
+    HttpModule
   ],
-  providers: [
+  providers: [    
+    AuthService,
+    JwtAuthGuard,
+    JwtStrategy,    
+  ],
+  exports: [       
     AuthService,
     JwtAuthGuard,
     JwtStrategy,
-    
   ]
 })
 export class AuthModule {}

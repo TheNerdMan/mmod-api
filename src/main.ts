@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { PrismaDalc } from './dalc/prisma.dalc';
+import { PrismaRepo } from './repositories/prisma.repo';
 import { AppModule } from './app.module';
 import { appConfig } from '../config/config';
 
@@ -15,7 +15,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  const prismaDalc: PrismaDalc = app.get(PrismaDalc);
+  const prismaDalc: PrismaRepo = app.get(PrismaRepo);
   prismaDalc.enableShutdownHooks(app)
 
   await app.listen(appConfig.port);
