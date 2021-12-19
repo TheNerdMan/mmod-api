@@ -15,6 +15,7 @@ import { appConfig } from 'config/config';
 import { lastValueFrom, map } from 'rxjs';
 import * as xml2js from 'xml2js';
 import { HttpService } from '@nestjs/axios';
+import { OpenIDDto } from '../dto/open-ID.dto';
 
 @Injectable()
 export class UsersService {
@@ -193,7 +194,42 @@ export class UsersService {
 
 	//#region Find or create
 
-	async FindOrCreateFromGame(steamID: string): Promise<User> {
+	async FindOrCreateFromGame(steamID: string): Promise<User> {		
+		const profile = await this.ExtractUserProfileFromSteamID(steamID);		
+		return this.FindOrCreateUserFromProfile(profile);
+	}
+
+	// TODO: openIDProfile Type
+	async FindOrCreateFromWeb(openID: OpenIDDto): Promise<User> {
+		// Grab Steam ID from community url		
+		const identifierRegex = /^https?:\/\/steamcommunity\.com\/openid\/id\/(\d+)$/;
+		const steamID = identifierRegex.exec(openID.claimed_id)[1];
+
+		const profile = await this.ExtractUserProfileFromSteamID(steamID);
+
+		return this.FindOrCreateUserFromProfile(profile);
+	}
+	//#endregion
+	
+	//#region Update
+	async UpdateUser(userID: number, updateInput: Prisma.UserUpdateInput): Promise<User> {
+		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+		whereInput.id = userID;
+        return await this.userRepo.Update(whereInput, updateInput);
+    }
+
+	async UpdateRefreshToken(userID: number, refreshToken: string): Promise<UserAuth> {
+		const updateInput: Prisma.UserAuthUpdateInput = {};
+		updateInput.refreshToken = refreshToken;
+		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
+		whereInput.id = userID;
+        return await this.userRepo.UpdateAuth(whereInput, updateInput);
+    }
+
+	//#endregion
+
+	//#region Private
+	private async ExtractUserProfileFromSteamID(steamID: string): Promise<UserDto> {
 		const data = {
 			summaries: {
 				profilestate: {},
@@ -238,7 +274,8 @@ export class UsersService {
 				})
 			)
 		)
-		data.xmlData = getSteamProfileResponse;
+
+        data.xmlData = getSteamProfileResponse;
 
 		if (data.summaries.profilestate !== 1)
 			return Promise.reject(new HttpException('We do not authenticate Steam accounts without a profile. Set up your community profile on Steam!', 403));
@@ -260,51 +297,11 @@ export class UsersService {
 			createdAt: undefined,
 			updatedAt: undefined,
 		};
-		
-		return this.FindOrCreateFromSteamID(profile);
+		return profile;		
 	}
 
-	// TODO: openIDProfile Type
-	async FindOrCreateFromWeb(openIDProfile: any): Promise<User> {
 
-		const profile: UserDto = {
-			alias: openIDProfile.alias,
-			avatarURL: openIDProfile.avatarURL,
-			country: openIDProfile.country,
-			id: 0,
-			steamID: openIDProfile.id,
-			aliasLocked: false,
-			avatar: '',
-			roles: 0,
-			bans: 0,
-			createdAt: undefined,
-			updatedAt: undefined,
-		};
-
-		return this.FindOrCreateFromSteamID(profile);
-	}
-	//#endregion
-	
-	//#region Update
-	async UpdateUser(userID: number, updateInput: Prisma.UserUpdateInput): Promise<User> {
-		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
-		whereInput.id = userID;
-        return await this.userRepo.Update(whereInput, updateInput);
-    }
-
-	async UpdateRefreshToken(userID: number, refreshToken: string): Promise<UserAuth> {
-		const updateInput: Prisma.UserAuthUpdateInput = {};
-		updateInput.refreshToken = refreshToken;
-		const whereInput: Prisma.UserAuthWhereUniqueInput = {};
-		whereInput.id = userID;
-        return await this.userRepo.UpdateAuth(whereInput, updateInput);
-    }
-
-	//#endregion
-
-	//#region Private
-
-	private async FindOrCreateFromSteamID(profile: UserDto): Promise<User> {
+	private async FindOrCreateUserFromProfile(profile: UserDto): Promise<User> {
 		const whereInput: Prisma.UserWhereUniqueInput = {};
 		whereInput.steamID = profile.steamID;
 

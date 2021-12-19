@@ -12,6 +12,7 @@ const configs: IAllConfigs = {
 		baseURL_CDN: 'http://localhost:3000',
 		domain: 'localhost',
 		port: 3000,
+		appID: 669270,
 		accessToken: {
 			secret: 'test',
 			expTime: '15m',
@@ -60,6 +61,7 @@ const configs: IAllConfigs = {
 		baseURL_CDN: 'http://localhost:3000',
 		domain: 'localhost',
 		port: 3000,
+		appID: 669270,
 		accessToken: {
 			secret: 'development',
 			expTime: '15m',
@@ -108,6 +110,7 @@ const configs: IAllConfigs = {
 		baseURL_CDN: process.env.CDN_URL ?? "undefined",
 		domain: 'momentum-mod.org',
 		port: +(process.env.NODE_PORT ?? "undefined"),
+		appID: 669270,
 		accessToken: {
 			secret: process.env.JWT_SECRET ?? "undefined",
 			expTime: '15m',
@@ -161,10 +164,10 @@ export interface IConfig {
 		baseURL: string;
 		baseURL_API: string;
 		baseURL_Auth: string;
-
 		baseURL_CDN: string;
 		domain: string;
-		port: number
+		port: number;
+		appID: number;
 		accessToken: {
 			secret: string;
 			expTime: string;

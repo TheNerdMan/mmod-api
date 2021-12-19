@@ -20,6 +20,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     * @summary Is this a valid JWT?
     */
     async validate(token: string) {
-        return this.authService.VerifyToken(token);
+        // if its valid then this will hit
+
+        return true;
     }
 }

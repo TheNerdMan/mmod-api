@@ -5,6 +5,8 @@ import { User } from '@prisma/client';
 import { UsersService } from '../services/users.service';
 import { appConfig } from '../../config/config';
 import { lastValueFrom, map } from 'rxjs';
+import { OpenIDDto } from '../dto/open-ID.dto';
+import { JWTResponseDto } from '../dto/api-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -15,13 +17,13 @@ export class AuthService {
         private http: HttpService) {
     }
     
-    async validateSteam(userTicketRaw: string, idToVerify: string): Promise<string> {
+    async ValidateFromInGame(userTicketRaw: string, idToVerify: string): Promise<JWTResponseDto> {
 		const userTicket = Buffer.from(userTicketRaw, 'utf8').toString('hex');
 
         const requestConfig = {
             params: {
                 key: appConfig.steam.webAPIKey,
-                appid: 669270,
+                appid: appConfig.appID,
                 ticket: userTicket
             }
         }
@@ -42,17 +44,34 @@ export class AuthService {
             // Bad request, and not sending the error object just in case of hidden bans
         }
 
-        if (sres.data.response.params.result === 'OK') {
-            if (idToVerify === sres.data.response.params.steamid) {
-                const user = await this.userService.FindOrCreateFromGame(idToVerify);
-                const token = await this.GenAccessToken(user, true);
-                return token;                                   
-            } else {
-                throw new UnauthorizedException(); // Generate an error here
-            }
-        } else {
-            return JSON.stringify(sres.data); // TODO parse the error?
+        if (sres.data.response.params.result !== 'OK') { throw new HttpException(JSON.stringify(sres.data), 500) } // TODO parse the error? 
+
+        if (idToVerify !== sres.data.response.params.steamid) { throw new UnauthorizedException(); }// Generate an error here
+        
+        const user = await this.userService.FindOrCreateFromGame(idToVerify);
+        const token = await this.GenAccessToken(user, true);
+        const refreshToken = await this.GenRefreshToken(user.id, true);
+        const response: JWTResponseDto = {
+            access_token: token,
+            expires_in: appConfig.accessToken.gameExpTime,
+            refresh_token: refreshToken,
+            token_type: 'JWT',
+        }  
+        return response;                                      
+    }
+
+    async ValidateFromWeb(openID: OpenIDDto): Promise<JWTResponseDto> {
+        const user = await this.userService.FindOrCreateFromWeb(openID);
+        
+        const token = await this.GenAccessToken(user, false);
+        const refreshToken = await this.GenRefreshToken(user.id, false);
+        const response: JWTResponseDto = {
+            access_token: token,
+            expires_in: appConfig.accessToken.expTime,
+            refresh_token: refreshToken,
+            token_type: 'JWT',
         }
+        return response;                                   
     }
 
 	async CreateRefreshToken(user: User, gameAuth: boolean): Promise<string> {
